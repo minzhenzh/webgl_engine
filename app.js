@@ -8,14 +8,20 @@ import Time from './source/time.js';
 import { initSimpleQuad } from "./demo/simpleQuad.js";
 import { autumn } from "./demo/autumnWind.js";
 import { initAniTest } from "./demo/aniTest.js";
-import { initSnow } from "./demo/snowCleaned.js";
+import { initSnow } from "./demo/snow.js";
 import { initBlastParticle } from "./demo/blastParticle.js";
-import { test } from "./demo/test.js";
 
 
 const time = new Time();
 window.time = time;
 
+const effects = {
+    snow: initSnow,
+    fire: initAniTest,
+    autumn: autumn,
+    blast: initBlastParticle,
+    quad: initSimpleQuad
+};
 
 function main() {
 
@@ -25,27 +31,53 @@ function main() {
     canvas.height = window.innerHeight;
     gl.viewport(0, 0, canvas.width, canvas.height);
 
+    // pick effect from url, e.g. index.html?demo=fire
+    const name = new URLSearchParams(window.location.search).get('demo') ?? 'snow';
+    const fx = effects[name];
+
     // init camera
-    const camera = new OrthCamera({
-        widthSpan: 70,
-        aspect: canvas.width / canvas.height });
-    // const camera = new PerspCamera({
-    //     target:[0,10,0]
-    // });
-    const r = 100,
-        cos45 = Math.cos(45 * Math.PI / 180),
+    let camera, r;
+    if (name === 'blast') {
+        // blast ring is radius 50, needs a wider perspective view
+        camera = new PerspCamera({
+            aspect: canvas.width / canvas.height });
+        r = 800;
+    } else {
+        camera = new OrthCamera({
+            widthSpan: 70,
+            aspect: canvas.width / canvas.height });
+        r = 100;
+    }
+    const cos45 = Math.cos(45 * Math.PI / 180),
         sin35 = Math.sin(35 * Math.PI / 180);
     camera.setPosition([r * cos45, r * sin35, r * cos45]);
     camera.updateProjection();
     camera.updateView();
     camera.updateViewInverse();
 
-    // initSimpleQuad(gl, camera);
-    // autumn(gl, canvas, camera);
-    // initAniTest(gl, canvas, camera);
-    initSnow(gl, canvas, camera);
-    // initBlastParticle(gl, camera);
-    // test(gl, canvas, camera);
+    if (fx) {
+        console.log(`Running "${name}"`);
+        fx(gl, canvas, camera);
+    } else {
+        console.warn(`"${name}" doesn’t exist.`);
+    }
+
+    // demo selector
+    const selector = document.getElementById('demo-selector');
+    for (const key in effects) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        option.selected = key === name;
+        selector.appendChild(option);
+    }
+    selector.addEventListener('change', e => switchEffect(e.target.value));
+
+    function switchEffect(name) {
+        window.location.search = `?demo=${name}`;
+    }
+
+    window.switchEffect = switchEffect;
 }
 
 main();

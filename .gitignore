@@ -18,3 +18,4 @@ build/
 shaders/output.js
 shaders/output.js
 .vite-inspect
+dist/
