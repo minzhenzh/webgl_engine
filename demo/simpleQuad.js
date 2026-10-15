@@ -1,5 +1,7 @@
 import Shader from "../source/shader.js";
-import {basicFrag, basicVert} from "../shaders/output.js";
+// import {basicFrag, basicVert} from "../shaders/output.js";
+import basicVert from "../shaders/glsl/basic-vert.glsl";
+import basicFrag from "../shaders/glsl/basic-frag.glsl";
 import Transform from "../source/transform.js";
 import Material from "../source/material.js";
 import {genQuad} from "../source/generatorHelper.js";
@@ -7,7 +9,7 @@ import Shape from "../source/shape.js";
 import {readAttrSchema} from "../source/shapeHelper.js";
 
 
-export function initSimpleQuad(gl, camera) {
+export function initSimpleQuad(gl, canvas, camera) {
 
     const quadParams = {
         quadSize: 10,
@@ -37,7 +39,7 @@ export function initSimpleQuad(gl, camera) {
     const quadData = genQuad(quadParams.quadSize);
     const quadShape = new Shape(
         'quad',
-        {count: 6, schema: readAttrSchema(basicVert.attribute)});
+        {count: 6, schema: readAttrSchema(basicVert.input)});
     quadShape.initialize({gl});
     quadShape.update(gl, 'quadBuffer', quadData);
 

@@ -11,15 +11,23 @@ import { sqrtFloor } from "../source/mathHelper.js";
 import { readAttrSchema } from "../source/shapeHelper.js";
 import { genAngVel, genLinVel, genQuad, genRectHaltonPos } from "../source/generatorHelper.js";
 
-import {
-    arrowFrag,
-    arrowVert, basicFrag,
-    basicVert,
-    screenQuadFrag,
-    screenQuadVert,
-    solverFrag,
-    solverPartiVert
-} from "../shaders/output.js";
+// import {
+//     arrowFrag,
+//     arrowVert, basicFrag,
+//     basicVert,
+//     screenQuadFrag,
+//     screenQuadVert,
+//     solverFrag,
+//     solverPartiVert
+// } from "../shaders/output.js";
+
+import arrowVert from "../shaders/glsl/arrow-vert.glsl";
+import arrowFrag from "../shaders/glsl/arrow-frag.glsl";
+import basicVert from "../shaders/glsl/basic-vert.glsl";
+import basicFrag from "../shaders/glsl/basic-frag.glsl";
+import solverFrag from "../shaders/glsl/solver-frag.glsl";
+import screenQuadFrag from "../shaders/glsl/screenQuad-frag.glsl";
+import screenQuadVert from "../shaders/glsl/screenQuad-vert.glsl";
 
 
 export function autumn(gl, canvas, camera) {
@@ -35,7 +43,7 @@ export function autumn(gl, canvas, camera) {
         uPixelNum: 4
     }
     // const partiCount = partiParams.duration * partiParams.rate;
-    const partiCount = 1;
+    const partiCount = 16*16;
 
     const solverParams = {
         gravitySwitcher: 1,
@@ -104,7 +112,7 @@ export function autumn(gl, canvas, camera) {
     // const obstacleShape = new Shape(
     //     'obstacle',
     //     {count:1,
-    //      schema:readAttrSchema(obstacleVert.attribute),
+    //      schema:readAttrSchema(obstacleVert.input),
     //      state:3});
     // obstacleShape.initialize({ gl });
     // obstacleShape.update(gl, 'obstacleBuffer', [0,0]);
@@ -230,7 +238,7 @@ export function autumn(gl, canvas, camera) {
             'particle',
             {
                 count: partiCount,
-                schema: readAttrSchema(solverPartiVert.attribute),
+                schema: readAttrSchema(arrowVert.input),
                 state: 3
             });
         partiShape.initialize({gl});
@@ -262,7 +270,7 @@ export function autumn(gl, canvas, camera) {
     const emitterQuadData = genQuad(1);
     const emitterQuadShape = new Shape(
         'emitterQuad',
-        {count: 6, schema: readAttrSchema(basicVert.attribute)});
+        {count: 6, schema: readAttrSchema(basicVert.input)});
     emitterQuadShape.initialize({gl});
     emitterQuadShape.update(gl, 'quadBuffer', emitterQuadData);
 
@@ -288,7 +296,7 @@ export function autumn(gl, canvas, camera) {
     const groundQuadData = genQuad(1.0);
     const groundQuadShape = new Shape(
         'groundQuad',
-        {count: 6, schema: readAttrSchema(basicVert.attribute)});
+        {count: 6, schema: readAttrSchema(basicVert.input)});
     groundQuadShape.initialize({gl});
     groundQuadShape.update(gl, 'quadBuffer', groundQuadData);
 

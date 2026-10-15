@@ -5,8 +5,8 @@ import Material from "./material.js";
 
 export default class _particleMaterial extends Material{
 
-    constructor(params = {}) {
-        super(params);
+    constructor(name, params = {}) {
+        super(name, params);
         this.numFrames = params.numFrames || 1;
         this.partiCount = params.partiCount || 1;
         this.numGen = params.numGen || 1;
@@ -28,18 +28,18 @@ export default class _particleMaterial extends Material{
 
     preDraw(gl, time, camera, transform) {
 
-        this.uniforms["uTime"].value = time.ElapsedTime;
+        this.setUniform('uTime', time.ElapsedTime);
 
-        this.uniforms["uDuration"].value = this.duration;
-        this.uniforms["uPartiCount"].value = this.partiCount;
-        this.uniforms["uNumGen"].value = this.numGen;
-        this.uniforms["uGravity"].value = this.gravity;
-        this.uniforms["uLifeTime"].value = this.lifeTime;
+        this.setUniform('uDuration', this.duration);
+        this.setUniform('uPartiCount', this.partiCount);
+        this.setUniform('uNumGen', this.numGen);
+        this.setUniform('uGravity', this.gravity);
+        this.setUniform('uLifeTime', this.lifeTime);
 
-        this.uniforms["_ANI_TEX_0"].value = [
-            this.texWidth, this.texHeight, this.tileSize, this.numFrames];
+        this.setUniform('_ANI_TEX_0', [
+            this.texWidth, this.texHeight, this.tileSize, this.numFrames]);
 
-        this.uniforms["_ANI_TEX_0_FPS"].value = this.aniFps;
+        this.setUniform('_ANI_TEX_0_FPS', this.aniFps);
 
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE);

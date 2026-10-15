@@ -1,12 +1,14 @@
 import Shader from "../source/shader.js";
-import {particle2dVert, particleFrag} from "../shaders/output.js";
+// import {particle2dVert, particleFrag} from "../shaders/output.js";
+import particle2dVert from "../shaders/glsl/particle2d-vert.glsl";
+import particleFrag from "../shaders/glsl/particle-frag.glsl";
 import Transform from "../source/transform.js";
 import Texture2D from "../source/texture2d.js";
 import {generateCirclePosVelRandom} from "../source/generatorHelper.js";
 import _particleMaterial from "../source/_particleMaterial.js";
 import _staticEmitter from "../source/_staticEmitter.js";
 
-export function initBlastParticle(gl, camera) {
+export function initBlastParticle(gl, canvas, camera) {
 
     const particleParams = {
         numGen: 1,
@@ -61,7 +63,7 @@ export function initBlastParticle(gl, camera) {
         });
         initPosVelTexture.initialize({gl});
 
-        const particleMaterial = new _particleMaterial({
+        const particleMaterial = new _particleMaterial('particleMat', {
             shader: particleShader,
             tileSize: 128,
             texWidth: 768,
@@ -76,7 +78,7 @@ export function initBlastParticle(gl, camera) {
         particleMaterial.setTexture('uColorSampler', colorTexture);
         particleMaterial.setTexture('uGeneratorSampler', initPosVelTexture);
 
-        const particleShape = new _staticEmitter({
+        const particleShape = new _staticEmitter('particle', {
             data: {...particleParams, partiCount: partiCount}
         });
         particleShape.initialize({gl});

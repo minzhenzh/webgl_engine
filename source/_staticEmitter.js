@@ -14,8 +14,8 @@ export default class _staticEmitter extends Shape {
     particleBuffer = null;
     bufferSubData = new Float32Array(LAST_IDX);
 
-    constructor(params = {}) {
-        super(params);
+    constructor(name, params = {}) {
+        super(name, params);
         this.data = {
             ..._staticEmitter.DEFAULT_DATA,
             ...params.data,         
@@ -72,24 +72,24 @@ export default class _staticEmitter extends Shape {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuffer);
 
         gl.vertexAttribPointer(
-            material.dataLocation.attributes['aStartTime'],
+            material.dataLocation.input['aStartTime'],
             1, gl.FLOAT, false, stride,
             sizeofFloat * START_TIME_IDX);
         gl.enableVertexAttribArray(
-            material.dataLocation.attributes['aStartTime']);
+            material.dataLocation.input['aStartTime']);
 
         gl.vertexAttribPointer(
-            material.dataLocation.attributes['aParticleID'],
+            material.dataLocation.input['aParticleID'],
             1, gl.FLOAT, false, stride,
             sizeofFloat * PARTICLE_ID_IDX);
         gl.enableVertexAttribArray(
-            material.dataLocation.attributes['aParticleID']);
+            material.dataLocation.input['aParticleID']);
         
         gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuffer);
         gl.drawArrays(gl.POINTS, 0, this.data.partiCount);
 
-        gl.disableVertexAttribArray(material.dataLocation.attributes['aStartTime']);
-        gl.disableVertexAttribArray(material.dataLocation.attributes['aParticleID']);
+        gl.disableVertexAttribArray(material.dataLocation.input['aStartTime']);
+        gl.disableVertexAttribArray(material.dataLocation.input['aParticleID']);
         
     };
 }
