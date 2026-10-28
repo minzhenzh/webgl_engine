@@ -11,7 +11,7 @@ import gridConfig from './gridHelper/grid_config.json';
 
 import quadVert from "../shaders/glsl/quad-vert.glsl";
 import screenQuadVert from "../shaders/glsl/screenQuad-vert.glsl";
-import wavefrontFrag from "../shaders/glsl/wavefront-frag.glsl";
+import wavefrontFrag from "../shaders/glsl/wavefrontFlip-frag.glsl";
 import gradientFrag from "../shaders/glsl/gradient-frag.glsl";
 import densityVert from "../shaders/glsl/density-vert.glsl";
 import densityFrag from "../shaders/glsl/density-frag.glsl";
