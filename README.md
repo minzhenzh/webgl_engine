@@ -2,6 +2,11 @@
 
 WebGL2 GPU particle demos. Each particle demo runs on either solver: transform feedback (`tf`) or framebuffer (`fb`).
 
+Blog posts:
+
+* [Particles with Transform Feedback in WebGL2](https://minzhenzh.github.io/work/webgl2-transform-feedback-particles/)
+* [The Same Particles, on Framebuffers, in WebGL2](https://minzhenzh.github.io/work/webgl2-framebuffer-particles/)
+
 ## Run
 
 ```bash
