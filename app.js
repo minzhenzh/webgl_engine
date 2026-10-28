@@ -14,12 +14,16 @@ import { initGridAni } from "./demo/gridAni.js";
 import { initIsoAccAni } from "./demo/isoAccAni.js";
 import { initIsoVelAni } from "./demo/isoVelAni.js";
 import { initTopdownVelAni } from "./demo/topdownVelAni.js";
+import { initFlock } from "./demo/flock.js";
 
 
 // stages: the main steps from flocking to the velocity/acceleration field
+// showcase: the flyEnemy simulation drawn as dots or Kenney fish
 // tests: other versions kept from boids_demo and velocity_field
 // widthSpan: ortho camera width, boids_demo demos used 4, velocity_field demos 20
 const effects = {
+    flockDots:     { init: (gl, canvas, camera) => initFlock(gl, canvas, camera, 'dots'), group: 'showcase', widthSpan: 4 },
+    flockFish:     { init: (gl, canvas, camera) => initFlock(gl, canvas, camera, 'fish'), group: 'showcase', widthSpan: 4 },
     flyEnemy:      { init: initFlyEnemy,      group: 'stages', widthSpan: 4 },     // 1. boids flocking around obstacles
     newSlowEnemy:  { init: initNewSlowEnemy,  group: 'stages', widthSpan: 4 },     // 2. agents following the wavefront
     isoVelAni:     { init: initIsoVelAni,     group: 'stages', widthSpan: 20 },    // 3. velocity field
@@ -65,9 +69,9 @@ function main() {
         console.warn(`"${name}" doesn’t exist.`);
     }
 
-    // demo selector, grouped into stages and tests
+    // demo selector, grouped into showcase, stages and tests
     const selector = document.getElementById('demo-selector');
-    for (const group of ['stages', 'tests']) {
+    for (const group of ['showcase', 'stages', 'tests']) {
         const optgroup = document.createElement('optgroup');
         optgroup.label = group;
         for (const key in effects) {

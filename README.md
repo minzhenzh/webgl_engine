@@ -13,6 +13,13 @@ Pick a demo from the dropdown in the bottom-left corner, or open `http://localho
 
 ## Demos
 
+Showcase, the `flyEnemy` simulation on a water map:
+
+| demo | file | |
+|---|---|---|
+| `flockDots` | `demo/flock.js` | boids drawn as dots |
+| `flockFish` | `demo/flock.js` | boids drawn as fish |
+
 Main stages:
 
 | demo | file | |
@@ -26,4 +33,4 @@ Other test versions: `slowEnemy`, `aniEnemy`, `gridAni`, `grid`, `topdownVelAni`
 
 `demo/gridHelper/gridHelper.html` is the grid editor. `demo/_boids/` holds archived reference pages, not part of the engine.
 
-The images in `resources/` are test images.
+The images in `resources/` are test images, except `resources/kenney-fish/` (CC0, from Kenney's [Fish Pack](https://kenney.nl/assets/fish-pack)).
