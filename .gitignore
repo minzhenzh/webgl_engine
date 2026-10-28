@@ -24,3 +24,4 @@ dist-ssr
 *.sln
 *.sw?
 shaders/output.js
+.claude/

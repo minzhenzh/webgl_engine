@@ -5,11 +5,32 @@ import Transform from './source/transform.js';
 import Time from './source/time.js';
 
 import { initQuad }from "./demo/quad.js";
+import { initFlyEnemy } from "./demo/flyEnemy.js";
+import { initSlowEnemy } from "./demo/slowEnemy.js";
+import { initNewSlowEnemy } from "./demo/newSlowEnemy.js";
+import { initAniEnemy } from "./demo/aniEnemy.js";
 import { initGrid } from "./demo/gridDemo.js";
+import { initGridAni } from "./demo/gridAni.js";
 import { initIsoAccAni } from "./demo/isoAccAni.js";
 import { initIsoVelAni } from "./demo/isoVelAni.js";
 import { initTopdownVelAni } from "./demo/topdownVelAni.js";
 
+
+// stages: the main steps from flocking to the velocity/acceleration field
+// tests: other versions kept from boids_demo and velocity_field
+// widthSpan: ortho camera width, boids_demo demos used 4, velocity_field demos 20
+const effects = {
+    flyEnemy:      { init: initFlyEnemy,      group: 'stages', widthSpan: 4 },     // 1. boids flocking around obstacles
+    newSlowEnemy:  { init: initNewSlowEnemy,  group: 'stages', widthSpan: 4 },     // 2. agents following the wavefront
+    isoVelAni:     { init: initIsoVelAni,     group: 'stages', widthSpan: 20 },    // 3. velocity field
+    isoAccAni:     { init: initIsoAccAni,     group: 'stages', widthSpan: 20 },    // 4. acceleration field
+    slowEnemy:     { init: initSlowEnemy,     group: 'tests',  widthSpan: 4 },
+    aniEnemy:      { init: initAniEnemy,      group: 'tests',  widthSpan: 4 },
+    gridAni:       { init: initGridAni,       group: 'tests',  widthSpan: 4 },
+    grid:          { init: initGrid,          group: 'tests',  widthSpan: 20 },
+    topdownVelAni: { init: initTopdownVelAni, group: 'tests',  widthSpan: 20 },
+    quad:          { init: initQuad,          group: 'tests',  widthSpan: 20 }
+};
 
 function main() {
 
@@ -23,20 +44,49 @@ function main() {
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.disable(gl.CULL_FACE);
 
-    // init camera
-    const camera = new OrthCamera({
-        widthSpan:20,
-        aspect: canvas.width / canvas.height,
-    });
-    camera.setPosition([0, 0, 10]);
-    camera.updateProjection();
-    camera.updateView();
-    camera.updateViewInverse();
+    // pick effect from url, e.g. index.html?demo=flyEnemy
+    const name = new URLSearchParams(window.location.search).get('demo') ?? 'isoAccAni';
+    const fx = effects[name];
 
-    // initGrid(gl, canvas, camera);
-    // initIsoVelAni(gl, canvas, camera);
-    // initTopdownVelAni(gl, canvas, camera);
-    initIsoAccAni(gl, canvas, camera);
+    if (fx) {
+        // init camera
+        const camera = new OrthCamera({
+            widthSpan: fx.widthSpan,
+            aspect: canvas.width / canvas.height,
+        });
+        camera.setPosition([0, 0, 10]);
+        camera.updateProjection();
+        camera.updateView();
+        camera.updateViewInverse();
+
+        console.log(`Running "${name}"`);
+        fx.init(gl, canvas, camera);
+    } else {
+        console.warn(`"${name}" doesn’t exist.`);
+    }
+
+    // demo selector, grouped into stages and tests
+    const selector = document.getElementById('demo-selector');
+    for (const group of ['stages', 'tests']) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = group;
+        for (const key in effects) {
+            if (effects[key].group !== group) continue;
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = key;
+            option.selected = key === name;
+            optgroup.appendChild(option);
+        }
+        selector.appendChild(optgroup);
+    }
+    selector.addEventListener('change', e => switchEffect(e.target.value));
+
+    function switchEffect(name) {
+        window.location.search = `?demo=${name}`;
+    }
+
+    window.switchEffect = switchEffect;
 }
 
 
