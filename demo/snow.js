@@ -5,31 +5,29 @@ import Material from "../source/material.js";
 import Shape from "../source/shape.js";
 import Texture2D from "../source/texture2d.js";
 import Solver from "../source/solver.js";
-import SolverMaterial from "../source/solverMaterial.js";
-import SolverShape from "../source/solverShape.js";
 
 import {readAttrSchema} from "../source/shapeHelper.js";
-import {genAngVel, genLinVel, genQuadUVXZ, genRectHaltonPos, genInitData} from "../source/generatorHelper.js";
+import {genAngVel, genLinVel, genQuadUVXZ, genRectHaltonPos} from "../source/generatorHelper.js";
 import {sqrtFloor} from "../source/mathHelper.js";
+import {SOLVER_TYPE, initParticleSolver, initParticleShape, setParticleData} from "./particleSolver.js";
 
 import quadVert from "../shaders/glsl/quad-vert.glsl";
 import quadFrag from "../shaders/glsl/quad-frag.glsl";
-import solverVert from "../shaders/glsl/solver-vert.glsl";
-import solverFrag from "../shaders/glsl/solver-frag.glsl";
 import snowVert from "../shaders/glsl/snow-vert.glsl";
+import snowFBVert from "../shaders/glsl/snow-fb-vert.glsl";
 import snowFrag from "../shaders/glsl/snow-frag.glsl";
 import screenQuadVert from "../shaders/glsl/screenQuad-vert.glsl";
 import screenQuadFrag from "../shaders/glsl/screenQuad-frag.glsl";
 
 
 
-export function initSnow(gl, canvas, camera) {
+export function initSnow(gl, canvas, camera, solverType = SOLVER_TYPE.tf) {
 
     const time = new Time();
     const MAXGENSIZE = 2;
     const STRIDE = 13;
     const particleParams = {
-        count: 1000,
+        count: 32*32,
         duration: 20,
         lifeTime: 20,
         minSize: 12,
@@ -74,32 +72,10 @@ export function initSnow(gl, canvas, camera) {
     }
 
 
-    // init solver
-    const solverShader = new Shader({
-        vertexSource: solverVert,
-        fragmentSource: solverFrag,
+    // init solver, transform feedback (tf) or framebuffer (fb)
+    const {solver, solverMaterial, solverShape} = initParticleSolver(gl, solverType, {
+        count: particleParams.count, stride: STRIDE
     });
-    solverShader.initialize({gl});
-
-
-    const solverMaterial = new SolverMaterial('solverMaterial',{
-        shader: solverShader,
-    });
-    solverMaterial.initialize({gl});
-
-    const initData = genInitData(particleParams.count, STRIDE);
-    const solverShape = new SolverShape('solverShape', {
-        count:particleParams.count, schema: readAttrSchema(solverVert.input)
-    });
-    solverShape.initialize({gl});
-
-
-    const solver = new Solver('solver',{
-        shape: solverShape, material: solverMaterial,
-        count: particleParams.count, mode:1, loop:true, stride: STRIDE,
-        data: initData
-    });
-    solver.initialize({gl}, 'particleBuffer');
 
     // solverShape.update(gl, 'particleBuffer',{material:solverMaterial, solver:solver, data:initData});
 
@@ -159,7 +135,7 @@ export function initSnow(gl, canvas, camera) {
 
     // init render
     const particleShader = new Shader({
-        vertexSource: snowVert,
+        vertexSource: solverType === SOLVER_TYPE.fb ? snowFBVert : snowVert,
         fragmentSource: snowFrag
     });
     particleShader.initialize({gl});
@@ -177,9 +153,8 @@ export function initSnow(gl, canvas, camera) {
     particleMaterial.setUniform('uAlpha', particleParams.alpha);
 
 
-    const particleShape = new Shape('particleShape',{
-        state: 3, count: particleParams.count, vaos: solverShape.VAOS,
-        schema: readAttrSchema(snowVert.input)
+    const particleShape = initParticleShape(solverType, {
+        count: particleParams.count, solverShape: solverShape, vertSource: snowVert
     });
 
 
@@ -281,6 +256,7 @@ export function initSnow(gl, canvas, camera) {
         // groundQuadMaterial.postDraw(gl);
 
         // draw particle
+        setParticleData(solverType, {material: particleMaterial, solver: solver, count: particleParams.count});
         particleMaterial.preDraw(gl, camera);
         particleShape.draw(gl, particleMaterial);
         particleMaterial.postDraw(gl);

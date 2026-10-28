@@ -5,25 +5,23 @@ import Material from "../source/material.js";
 import Shape from "../source/shape.js";
 import Texture2D from "../source/texture2d.js";
 import Solver from "../source/solver.js";
-import SolverMaterial from "../source/solverMaterial.js";
-import SolverShape from "../source/solverShape.js";
 
 import {readAttrSchema} from "../source/shapeHelper.js";
-import {genAngVel, genLinVel, genQuadUVXZ, genRectHaltonPos, genInitData} from "../source/generatorHelper.js";
+import {genAngVel, genLinVel, genQuadUVXZ, genRectHaltonPos} from "../source/generatorHelper.js";
 import {sqrtFloor} from "../source/mathHelper.js";
+import {SOLVER_TYPE, initParticleSolver, initParticleShape, setParticleData} from "./particleSolver.js";
 
 import quadVert from "../shaders/glsl/quad-vert.glsl";
 import quadFrag from "../shaders/glsl/quad-frag.glsl";
-import solverVert from "../shaders/glsl/solver-vert.glsl";
-import solverFrag from "../shaders/glsl/solver-frag.glsl";
 import leavesVert from "../shaders/glsl/leaves-vert.glsl";
+import leavesFBVert from "../shaders/glsl/leaves-fb-vert.glsl";
 import leavesFrag from "../shaders/glsl/leaves-frag.glsl";
 import screenQuadVert from "../shaders/glsl/screenQuad-vert.glsl";
 import screenQuadFrag from "../shaders/glsl/screenQuad-frag.glsl";
 
 
 
-export function initLeaves(gl, canvas, camera) {
+export function initLeaves(gl, canvas, camera, solverType = SOLVER_TYPE.tf) {
 
     const time = new Time();
     const MAXGENSIZE = 2;
@@ -81,32 +79,10 @@ export function initLeaves(gl, canvas, camera) {
     }
 
 
-    // init solver
-    const solverShader = new Shader({
-        vertexSource: solverVert,
-        fragmentSource: solverFrag,
+    // init solver, transform feedback (tf) or framebuffer (fb)
+    const {solver, solverMaterial, solverShape} = initParticleSolver(gl, solverType, {
+        count: particleParams.count, stride: STRIDE
     });
-    solverShader.initialize({gl});
-
-
-    const solverMaterial = new SolverMaterial('solverMaterial',{
-        shader: solverShader,
-    });
-    solverMaterial.initialize({gl});
-
-    const initData = genInitData(particleParams.count, STRIDE);
-    const solverShape = new SolverShape('solverShape', {
-        count:particleParams.count, schema: readAttrSchema(solverVert.input),
-    });
-    solverShape.initialize({gl});
-
-
-    const solver = new Solver('solver',{
-        shape: solverShape, material: solverMaterial,
-        count: particleParams.count, mode:1, loop:true, stride: STRIDE,
-        data:initData
-    });
-    solver.initialize({gl}, 'particleBuffer');
 
 
     const emitterSlot0 = [];
@@ -166,7 +142,7 @@ export function initLeaves(gl, canvas, camera) {
 
     // init render
     const particleShader = new Shader({
-        vertexSource: leavesVert,
+        vertexSource: solverType === SOLVER_TYPE.fb ? leavesFBVert : leavesVert,
         fragmentSource: leavesFrag
     });
     particleShader.initialize({gl});
@@ -198,9 +174,8 @@ export function initLeaves(gl, canvas, camera) {
         particleMaterial.setUniform('_uAniTexFps', aniTexParams.aniFps)
 
 
-        const particleShape = new Shape('particleShape',{
-            state: 3, count: particleParams.count, vaos: solverShape.VAOS,
-            schema: readAttrSchema(leavesVert.input)
+        const particleShape = initParticleShape(solverType, {
+            count: particleParams.count, solverShape: solverShape, vertSource: leavesVert
         });
 
 
@@ -296,6 +271,7 @@ export function initLeaves(gl, canvas, camera) {
             bkgMaterial.postDraw(gl);
 
             // draw particle
+            setParticleData(solverType, {material: particleMaterial, solver: solver, count: particleParams.count});
             particleMaterial.preDraw(gl, camera);
             particleShape.draw(gl, particleMaterial);
             particleMaterial.postDraw(gl);
