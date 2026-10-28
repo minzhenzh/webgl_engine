@@ -39,7 +39,7 @@ export function initSnow(gl, canvas, camera, solverType = SOLVER_TYPE.tf) {
         color:[0.85,0.85,0.85],
         alpha:0.8,
         emitterSize: 32,
-        emitterHeight: 40
+        emitterHeight: 24
     }
     const MAXCOL = sqrtFloor(particleParams.count);
 
@@ -49,7 +49,7 @@ export function initSnow(gl, canvas, camera, solverType = SOLVER_TYPE.tf) {
 
     const solverParams = {
         gravitySwitcher: 1,
-        gravity: [0, -10, 0],
+        gravity: [0, -3, 0],
         vortexSwitcher: 1,
         vortexScalar: 1/1000,
         noiseSwitcher: 1,
