@@ -2,6 +2,11 @@
 
 WebGL1 GPU particle demos using a framebuffer (ping-pong texture) solver.
 
+Blog posts:
+
+* [Blast: Playing a Fire Animation from One Texture](https://minzhenzh.github.io/work/webgl-blast-texture-atlas/)
+* [Snow: A Particle Solver Made of Framebuffers](https://minzhenzh.github.io/work/webgl-snow-framebuffer-solver/)
+
 ## Run
 
 ```bash
