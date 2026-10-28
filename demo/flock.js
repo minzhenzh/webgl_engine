@@ -60,7 +60,7 @@ export function initFlock(gl, canvas, camera, style = 'dots') {
     const fishParams = {
         files: ['fish_blue', 'fish_green', 'fish_orange', 'fish_pink', 'fish_red'],
         cellSize: 64,
-        pointSize: 22,
+        pointSize: 18,
     }
 
     const time = new Time();
@@ -324,6 +324,7 @@ export function initFlock(gl, canvas, camera, style = 'dots') {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.blendFunc(gl.ONE, gl.ZERO);
 
+        mapViewMaterial.setUniform('uRocksOnly', 0.0);
         mapViewMaterial.preDraw(gl, camera);
         quadShape.draw(gl, mapViewMaterial);
         mapViewMaterial.postDraw(gl);
@@ -337,6 +338,12 @@ export function initFlock(gl, canvas, camera, style = 'dots') {
         boidShape.draw(gl, boidMaterial);
         boidMaterial.postDraw(gl);
         gl.disable(gl.BLEND);
+
+        // rocks again on top, so sprites near a wall slide under the edge instead of covering it
+        mapViewMaterial.setUniform('uRocksOnly', 1.0);
+        mapViewMaterial.preDraw(gl, camera);
+        quadShape.draw(gl, mapViewMaterial);
+        mapViewMaterial.postDraw(gl);
     }
 
     drawFlock();
