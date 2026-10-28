@@ -19,8 +19,8 @@ import { SOLVER_TYPE } from "./demo/particleSolver.js";
 const effects = {
     snow:      { init: initSnow,    camera: 'ortho', solver: true },
     rain:      { init: initRain,    camera: 'iso',   solver: true, distance: 200, target: [50, 110, 0] },
-    leaves:    { init: initLeaves,  camera: 'iso',   solver: true, distance: 110, target: [0, 130, 0] },
-    flowers:   { init: initFlowers, camera: 'iso',   solver: true, distance: 110, target: [0, 130, 0] },
+    leaves:    { init: initLeaves,  camera: 'iso',   solver: true, distance: 110, target: [0, 80, 0] },
+    flowers:   { init: initFlowers, camera: 'iso',   solver: true, distance: 110, target: [0, 80, 0] },
     arrows:    { init: initArrows,  camera: 'iso',   solver: true, distance: 150, target: [0, 30, 0] },    // inter stage: particle direction change
     wavefront: { init: initWavefrontField, camera: 'ortho' },
     quad:      { init: initQuad,    camera: 'ortho' }
